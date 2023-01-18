@@ -1,14 +1,17 @@
 #!/bin/bash
-export PATH=/tahoma/emsla60288/edo/py3714/bin/:$PATH
-if [ -d  "venv3714" ]; then
-    echo "venv3714 directory present"
-else
-    python -m venv venv3714
-fi
-source venv3714/bin/activate
-python -m pip install --upgrade pip
-python -m pip install spython
-DOWNLOAD_DIR=/tahoma/datasets/alphafold
+#export PATH=/tahoma/emsla60288/edo/py3714/bin/:$PATH
+#if [ -d  "venv3714" ]; then
+#    echo "venv3714 directory present"
+#else
+#    python -m venv venv3714
+#fi
+#source venv3714/bin/activate
+#python -m pip install --upgrade pip
+#python -m pip install spython
+CUDA_DIR=/data/edo/cuda-11.3
+export LD_LIBRARY_PATH=$CUDA_DIR/lib64:$LD_LIBRARY_PATH
+#DOWNLOAD_DIR=/tahoma/datasets/alphafold/data
+export DOWNLOAD_DIR=/data/edo/openfold-myfork/data
 singularity exec \
 --nv \
 --bind $PWD:/data \
