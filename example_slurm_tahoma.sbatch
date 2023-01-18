@@ -11,13 +11,14 @@ module purge
 module load gcc
 export https_proxy=http://proxy.emsl.pnl.gov:3128
 #module load python
-org_dir=`pwd`
-cd /big_scratch
-mkdir -p fasta_dir
-cp $org_dir/benchmark_24aas.fasta fasta_dir/.
-cp /tahoma/emsla60288/edo/openfold/openfold.simg .
-singularity exec ./openfold.simg python3 /opt/openfold/run_pretrained_openfold.py --help 
-/tahoma/emsla60288/edo/openfold/singularity_run.sh
+#org_dir=`pwd`
+#cd /big_scratch
+#mkdir -p fasta_dir
+#cp $org_dir/benchmark_24aas.fasta fasta_dir/.
+#cp /tahoma/emsla60288/edo/openfold/openfold.simg .
+#singularity exec ./openfold.simg python3 /opt/openfold/run_pretrained_openfold.py --help 
+/tahoma/emsla60288/edo/openfold/singularity_training.sh
+#/tahoma/emsla60288/edo/openfold/singularity_run.sh
 exit 0
 rm -rf alphafold
 wget -q https://github.com/deepmind/alphafold/tarball/main -O - | tar -xz

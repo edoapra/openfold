@@ -41,6 +41,16 @@ patch -p0 -d /opt/conda/lib/python3.7/site-packages/ < /opt/openfold/lib/openmm.
 mkdir -p /opt/openfold
 cd /opt/openfold
 python3 setup.py install
+
+#install mmseqs
+apt-get install -y cmake
+cd /opt
+git clone --depth=1 https://github.com/soedinglab/MMseqs2.git
+cd MMseqs2
+mkdir -p build
+cd build
+cmake ../
+make -j3
 %environment
 export PATH=/opt/conda/bin:$PATH
 %runscript
