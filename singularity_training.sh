@@ -13,6 +13,7 @@ export LD_LIBRARY_PATH=$CUDA_DIR/lib64:$LD_LIBRARY_PATH
 export DOWNLOAD_DIR=/tahoma/emsla60288/edo/openfold/data
 mkdir -p alignment_dir
 singularity exec \
+--nv \
 --bind $PWD:/data \
 --bind "$DOWNLOAD_DIR":/database \
 ./openfold.simg \
@@ -21,6 +22,6 @@ singularity exec \
 	    /database/mmseqs_dbs \
 	        uniref30_2103_db \
     /data/alignment_dir \
-    /opt/MMseqs2/build/bin/mmseqs \
+    /opt/MMseqs2/build/src/mmseqs \
     --env_db colabfold_envdb_202108_db \
     --pdb70 data/pdb70/pdb \
