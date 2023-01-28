@@ -15,26 +15,35 @@ org.opencontainers.image.version = "1.0.0"
 org.opencontainers.image.authors = "Gustaf Ahdritz"
 org.opencontainers.image.source = "https://github.com/aqlaboratory/openfold"
 org.opencontainers.image.licenses = "Apache License 2.0"
-org.opencontainers.image.base.name="docker.io/nvidia/cuda:10.2-cudnn8-runtime-ubuntu18.04"
+org.opencontainers.image.base.name="docker.io/nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu18.04"
 %post
-
+CUDA=11.3
+SINGULARITY_CUDA=11.3
+CUDA_V1=11
+CUDA_V2=3
 # metainformation
 
 apt-key del 7fa2af80
 apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
 apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
 
-apt-get update && apt-get install -y wget libxml2 cuda-minimal-build-11-3 libcusparse-dev-11-3 libcublas-dev-11-3 libcusolver-dev-11-3  cmake git aria2 && which cmake && cmake --version
-wget -P /tmp \
-"https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh" \
-&& bash /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda \
-&& rm /tmp/Miniconda3-latest-Linux-x86_64.sh
+apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y wget libxml2 cuda-minimal-build-${CUDA_V1}-${CUDA_V2} libcusparse-dev-${CUDA_V1}-${CUDA_V2} libcublas-dev-${CUDA_V1}-${CUDA_V2} libcusolver-dev-${CUDA_V1}-${CUDA_V2}  cmake git aria2 && which cmake && \
+ rm -rf /var/lib/apt/lists/* && \
+ apt-get autoremove -y && \
+ apt-get clean && \
+cmake --version
+
+wget -O /tmp/miniconda3.sh \
+https://repo.anaconda.com/miniconda/Miniconda3-py37_4.12.0-Linux-x86_64.sh && \
+ bash /tmp/miniconda3.sh -b -p /opt/conda  && \
+ rm /tmp/miniconda3.sh
 PATH=/opt/conda/bin:$PATH
 
 
 # installing into the base environment since the docker container wont do anything other than run openfold
-export CONDA_FETCH_THREADS=1
-conda config --set  fetch_threads 1
+export CONDA_FETCH_THREADS=2 # parallel download for recent conda versions
+export MAX_JOBS=2 # ninja workers
+conda config --set  fetch_threads 2 || true && \
 conda env update -n base --file /opt/openfold/environment.yml && conda clean --all
 
 #wget -q -P /opt/openfold/openfold/resources \
@@ -67,15 +76,33 @@ mkdir -p build  && \
 cd build  && \
 cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt/conda ../  && \
 make -j3  && \
-make install
+make install && \
+cd ../.. && \
+rm -rf MMseqs2 && \
 #install flash
 cd /opt && \
 git clone https://github.com/HazyResearch/flash-attention && \
 cd flash-attention && \
 git checkout 5b838a8bef &&  \
-python3 setup.py install
+python3 setup.py install && \
+cd .. && \
+rm -rf flash-attention && \
 # install pyindex
-python3 -m pip install nvidia-pyindex
+python3 -m pip install nvidia-pyindex && \
+# size
+ conda clean --all --force-pkgs-dirs --yes && \
+ find /opt/conda/ -follow -type f -name '*.a' -delete && \
+ find /opt/conda/ -follow -type f -name '*.pyc' -delete && \
+ find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
+ apt-get -y --allow-change-held-packages purge cmake build-essential \
+ libcublas-${CUDA_V1}-${CUDA_V2} libcusparse-${CUDA_V1}-${CUDA_V2} || true && \
+ apt-get -y  autoremove && \
+ apt update && \
+ apt-get -y install libgomp1:amd64 libcusolver-${CUDA_V1}-${CUDA_V2} cuda-nvcc-${CUDA_V1}-${CUDA_V2}  && \
+ apt-get clean && \
+ echo '/opt/conda size' `du -sh /opt/conda` && \
+ dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
+
 %environment
 export PATH=/opt/conda/bin:$PATH
 %runscript
