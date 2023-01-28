@@ -19,7 +19,6 @@ jobs:
     strategy:
         fail-fast: false
     steps:
-    uses: actions/setup-python@v4
     - name: tag
       run: |
         if [[ ${{ github.ref_name }} ==  main ]]; then
