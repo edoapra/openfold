@@ -1,17 +1,23 @@
 #!/bin/bash
-CUDA_DIR=/tahoma/emsla60288/edo/cuda-11.3
-export LD_LIBRARY_PATH=$CUDA_DIR/lib64:$LD_LIBRARY_PATH
+export ORGDIR=`pwd`
+export WORKDIR=/big_scratch
+export OUTDIR=`pwd`/out.$SLURM_JOBID
+export https_proxy=http://proxy.emsl.pnl.gov:3128
+export http_proxy=http://proxy.emsl.pnl.gov:3128
 export DOWNLOAD_DIR=/tahoma/emsla60288/edo/openfold/data
 INPUT_FASTA_DIR=/database/test_fasta_dir
 OPENFOLD_PATH=/opt/openfold/
 OPENFOLD_RESOURCES=/tahoma/emsla60288/edo/openfold/openfold/resources
-rm -rf alignments
+mkdir -p $OUTDIR
+cd $WORKDIR
+#rm -rf alignments
+singularity pull -F --name openfold.simg oras://ghcr.io/edoapra/openfold/openfold:latest
 INPUT_FASTA_DIR=/tahoma/emsla60288/edo/openfold/data/test_fasta_dir
 singularity exec \
 --nv \
 --bind $PWD:/data \
 --bind "$DOWNLOAD_DIR":/database \
---bind "$OPENFOLD_RESOURCES":/resources \
+--bind "$OPENFOLD_RESOURCES":$OPENFOLD_PATH/openfold/resources \
 ./openfold.simg \
 	    python3 $OPENFOLD_PATH/run_pretrained_openfold.py \
     $INPUT_FASTA_DIR \
@@ -28,8 +34,10 @@ singularity exec \
     --hhsearch_binary_path hhsearch \
     --kalign_binary_path bin/kalign \
     --config_preset "model_1_ptm" \
-    --openfold_checkpoint_path /resources/openfold_params/finetuning_ptm_2.pt
-#    --openfold_checkpoint_path $OPENFOLD_PATH/openfold/resources/openfold_params/finetuning_ptm_2.pt
+    --openfold_checkpoint_path $OPENFOLD_RESOURCES/openfold_params/finetuning_ptm_2.pt
+rsync -av  *  $OUTDIR/.
+exit 0
+
 
 # run_pretrained_openfold.py [-h]
 #                                  [--use_precomputed_alignments USE_PRECOMPUTED_ALIGNMENTS]
