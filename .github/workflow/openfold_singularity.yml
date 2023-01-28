@@ -1,0 +1,74 @@
+name: openfold_apptainer
+
+on:
+  schedule:
+    - cron: '0 0 * * SUN'
+  repository_dispatch:
+    types: [backend_automation]
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  build_image:
+    runs-on: ubuntu-20.04
+    strategy:
+        fail-fast: false
+    steps:
+    - name: tag
+      run: |
+        if [[ ${{ github.ref_name }} ==  main ]]; then
+        echo "tag=oras://ghcr.io/${{ github.repository }}/openfold" >> $GITHUB_ENV
+        else
+        echo "tag=oras://ghcr.io/${{ github.repository }}/openfold_${{ github.ref_name }}" >> $GITHUB_ENV
+        fi
+    - name: echo-tag
+      run: |
+        echo ' the apptainer tag is ' "${{ env.tag }}"
+    - name: Checkout source
+      uses: actions/checkout@v3
+      with:
+        clean: false
+    - name: Install apptainer
+      env:
+        APP_VER: 1.1.2
+      run: |
+        sudo apt-get install -y  libfuse2 libseccomp2 zlib1g uidmap squashfs-tools squashfuse fuse2fs fuse-overlayfs fakeroot
+        wget -q  https://github.com/apptainer/apptainer/releases/download/v${APP_VER}/apptainer_${APP_VER}_amd64.deb 
+        sudo dpkg -i apptainer_${APP_VER}_amd64.deb
+        rm apptainer_${APP_VER}_amd64.deb
+        which apptainer
+        apptainer version
+    - name: build an apptainer container
+      run: |
+        pwd
+        ls -l
+        apptainer build --fakeroot openfold.simg  Singularity.def
+    - name: builddate
+      id: build-date
+      run: |
+        echo "date=$(TZ=America/Los_Angeles date +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
+    - name: push to ghcr.io
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | apptainer remote login -u ${{ github.actor }} --password-stdin oras://ghcr.io
+        pwd
+        ls -l
+        apptainer remote list
+        apptainer push openfold.simg ${{ env.tag }}:${{ env.date }}
+        apptainer push openfold.simg ${{ env.tag }}:latest
+    - name: test image with apptainer
+      run: |
+        pwd
+        ls -la
+        sudo apt-get install -y python3.9-minimal python3-venv python3.9-venv
+        python3.9 -m venv venv
+        source venv/bin/activate
+        python -V
+        python -m pip install --upgrade pip
+        python -m pip install --use-pep517 -r requirements.txt
+        apptainer pull -F openfold.sif ${{ env.tag }}:${{ env.date }}
+        apptainer exec ${{ env.tag }}:${{ env.date }} ldd /usr/bin/hhsearch 
+        apptainer exec ${{ env.tag }}:${{ env.date }} /usr/bin/hhsearch -v || true
+        apptainer exec ${{ env.tag }}:${{ env.date }} ptxas -V || true
+        OPENFOLD_DIR=`pwd` python ./run_singularity.py --help  || true
+        echo 'exit code ' $?
+        apptainer cache list -v
