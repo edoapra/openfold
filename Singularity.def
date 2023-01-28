@@ -12,10 +12,11 @@ setup.py /opt/openfold/setup.py
 lib/openmm.patch /opt/openfold/lib/openmm.patch
 %labels
 org.opencontainers.image.version = "1.0.0"
-org.opencontainers.image.authors = "Gustaf Ahdritz"
+org.opencontainers.image.authors = "Gustaf Ahdritz & Edoardo Apra"
 org.opencontainers.image.source = "https://github.com/aqlaboratory/openfold"
 org.opencontainers.image.licenses = "Apache License 2.0"
 org.opencontainers.image.base.name="docker.io/nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu18.04"
+org.opencontainers.image.description="Singularity image for OpenFold"
 %post
 CUDA=11.3
 SINGULARITY_CUDA=11.3
@@ -46,6 +47,7 @@ export MAX_JOBS=2 # ninja workers
 conda config --set  fetch_threads 2 || true && \
 conda env update -n base --file /opt/openfold/environment.yml && conda clean --all
 
+# we rely on openfold/openfold/resources being external from the container
 #wget -q -P /opt/openfold/openfold/resources \
 #https://git.scicore.unibas.ch/schwede/openstructure/-/raw/7102c63615b64735c4941278d92b554ec94415f8/modules/mol/alg/src/stereo_chemical_props.txt
 ## Certain tests need access to this file
@@ -107,8 +109,8 @@ python3 -m pip install nvidia-pyindex && \
  apt update && \
  apt-get -y install libgomp1:amd64 libcusolver-${CUDA_V1}-${CUDA_V2} cuda-nvcc-${CUDA_V1}-${CUDA_V2}  && \
  apt-get clean && \
- find /usr/local/cuda-${CUDA_V1}-${CUDA_V2} -follow -type f -name 'lib*.a' -delete && \
- find /usr/local/cuda-${CUDA_V1}-${CUDA_V2} -follow -type f -name '*.h' -delete && \
+ find /usr/local/cuda-${CUDA_V1}.${CUDA_V2} -follow -type f -name 'lib*.a' -delete && \
+ find /usr/local/cuda-${CUDA_V1}.${CUDA_V2} -follow -type f -name '*.h' -delete && \
  echo '/opt/conda size' `du -sh /opt/conda` && \
  dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
 
