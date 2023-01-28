@@ -3,8 +3,8 @@ name: openfold_apptainer
 on:
   push:
     paths-ignore:
-      - *sbatch
-      - *h
+      - '*.sh'
+      - '*.sbatch'
   pull_request:
   schedule:
     - cron: '0 0 * * SUN'
@@ -19,6 +19,7 @@ jobs:
     strategy:
         fail-fast: false
     steps:
+    uses: actions/setup-python@v4
     - name: tag
       run: |
         if [[ ${{ github.ref_name }} ==  main ]]; then
@@ -62,8 +63,6 @@ jobs:
         apptainer push openfold.simg ${{ env.tag }}:latest
     - name: test image with apptainer
       run: |
-        pwd
-        ls -la
         sudo apt-get install -y python3.9-minimal python3-venv python3.9-venv
         python3.9 -m venv venv
         source venv/bin/activate
