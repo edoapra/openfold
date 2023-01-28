@@ -62,14 +62,8 @@ jobs:
         apptainer push openfold.simg ${{ env.tag }}:latest
     - name: test image with apptainer
       run: |
-        sudo apt-get install -y python3.9-minimal python3-venv python3.9-venv
-        python3.9 -m venv venv
-        source venv/bin/activate
-        python -V
         apptainer pull -F openfold.sif ${{ env.tag }}:${{ env.date }}
         apptainer exec ${{ env.tag }}:${{ env.date }} ldd /usr/bin/hhsearch || true
         apptainer exec ${{ env.tag }}:${{ env.date }} hhsearch -h || true
         apptainer exec ${{ env.tag }}:${{ env.date }} ptxas -V || true
-        OPENFOLD_DIR=`pwd` python ./run_singularity.py --help  || true
-        echo 'exit code ' $?
         apptainer cache list -v
