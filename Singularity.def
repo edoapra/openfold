@@ -42,11 +42,12 @@ https://git.scicore.unibas.ch/schwede/openstructure/-/raw/7102c63615b64735c49412
 #mkdir -p tests/test_data/alphafold/common && \
 #ln -rs openfold/resources/stereo_chemical_props.txt tests/test_data/alphafold/common
 
-cd /opt/openfold &&
-#echo "Downloading OpenFold parameters..."
-bash scripts/download_openfold_params.sh openfold/resources
-echo "Downloading AlphaFold parameters..."
-ash scripts/download_alphafold_params.sh openfold/resources
+cd /opt/openfold && \
+ python -m pip install awscli &&  \
+echo "Downloading OpenFold parameters..." &&  \
+bash scripts/download_openfold_params.sh openfold/resources &&  \
+echo "Downloading AlphaFold parameters..." && \
+bash scripts/download_alphafold_params.sh openfold/resources  &&  \
 # Decompress test data
 gunzip tests/test_data/sample_feats.pickle.gz
 
