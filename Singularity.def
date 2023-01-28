@@ -33,6 +33,8 @@ PATH=/opt/conda/bin:$PATH
 
 
 # installing into the base environment since the docker container wont do anything other than run openfold
+export CONDA_FETCH_THREADS=1
+conda config --set  fetch_threads 1
 conda env update -n base --file /opt/openfold/environment.yml && conda clean --all
 
 wget -q -P /opt/openfold/openfold/resources \
@@ -68,10 +70,9 @@ make -j3  && \
 make install
 #install flash
 cd /opt && \
-wget https://github.com/HazyResearch/flash-attention/tarball/5b838a8bef -O flash-att.tar.gz && \
-tar xzf flash-att.tar.gz && \
-cd HazyResearch-flash-attention-*  && \
-python3 -m pip install torch && \
+git clone https://github.com/HazyResearch/flash-attention && \
+cd flash-attention && \
+git checkout 5b838a8bef &&  \
 python3 setup.py install
 # install pyindex
 python3 -m pip install nvidia-pyindex
