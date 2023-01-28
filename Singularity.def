@@ -24,7 +24,7 @@ apt-key del 7fa2af80
 apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
 apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/3bf863cc.pub
 
-apt-get update && apt-get install -y wget libxml2 cuda-minimal-build-11-3 libcusparse-dev-11-3 libcublas-dev-11-3 libcusolver-dev-11-3 git
+apt-get update && apt-get install -y wget libxml2 cuda-minimal-build-11-3 libcusparse-dev-11-3 libcublas-dev-11-3 libcusolver-dev-11-3  cmake && which cmake && cmake --version
 wget -P /tmp \
 "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh" \
 && bash /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda \
@@ -43,24 +43,24 @@ cd /opt/openfold
 python3 setup.py install
 
 #install mmseqs
-apt-get install -y cmake
-cd /opt  && \
-git clone --depth=1 https://github.com/soedinglab/MMseqs2.git  && \
-cd MMseqs2  && \
-mkdir -p build  && \
-cd build  && \
-cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt ../  && \
-make -j3  && \
-make install
-#install hhmer
-wget http://eddylab.org/software/hmmer/hmmer.tar.gz   && \
-tar zxf hmmer.tar.gz  && \
-cd hmmer-3.3.2  && \
-./configure --prefix /opt/conda  && \
-make  && \
-make check  && \
-make install  && \
-cd easel; make install
+
+#cd /opt  && \
+#git clone --depth=1 https://github.com/soedinglab/MMseqs2.git  && \
+#cd MMseqs2  && \
+#mkdir -p build  && \
+#cd build  && \
+#cmake -DCMAKE_INSTALL_PREFIX:PATH=/opt ../  && \
+#make -j3  && \
+#make install
+##install hhmer
+#wget http://eddylab.org/software/hmmer/hmmer.tar.gz   && \
+#tar zxf hmmer.tar.gz  && \
+#cd hmmer-3.3.2  && \
+#./configure --prefix /opt/conda  && \
+#make  && \
+#make check  && \
+#make install  && \
+#cd easel; make install
 #install flash
 %environment
 export PATH=/opt/conda/bin:$PATH
