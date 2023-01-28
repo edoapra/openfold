@@ -1,6 +1,11 @@
 name: openfold_apptainer
 
 on:
+  push:
+    paths-ignore:
+      - *sbatch
+      - *h
+  pull_request:
   schedule:
     - cron: '0 0 * * SUN'
   repository_dispatch:
