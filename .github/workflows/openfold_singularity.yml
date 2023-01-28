@@ -63,8 +63,6 @@ jobs:
         python3.9 -m venv venv
         source venv/bin/activate
         python -V
-#        python -m pip install --upgrade pip
-#        python -m pip install --use-pep517 -r requirements.txt
         apptainer pull -F openfold.sif ${{ env.tag }}:${{ env.date }}
         apptainer exec ${{ env.tag }}:${{ env.date }} ldd /usr/bin/hhsearch 
         apptainer exec ${{ env.tag }}:${{ env.date }} /usr/bin/hhsearch -v || true
