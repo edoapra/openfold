@@ -11,12 +11,12 @@ train_openfold.py /opt/openfold/train_openfold.py
 setup.py /opt/openfold/setup.py
 lib/openmm.patch /opt/openfold/lib/openmm.patch
 %labels
-org.opencontainers.image.version = "1.0.0"
-org.opencontainers.image.authors = "Gustaf Ahdritz & Edoardo Apra"
-org.opencontainers.image.source = "https://github.com/aqlaboratory/openfold"
-org.opencontainers.image.licenses = "Apache License 2.0"
-org.opencontainers.image.base.name="docker.io/nvidia/cuda:11.3.1-cudnn8-runtime-ubuntu18.04"
-org.opencontainers.image.description="Singularity image for OpenFold"
+MAINTAINER  Edoardo Apra <edoardo.apra@pnnl.gov>
+org.opencontainers.image.version  "1.0.0"
+org.opencontainers.image.authors  "Gustaf Ahdritz & Edoardo Apra"
+org.opencontainers.image.source  "https://github.com/aqlaboratory/openfold"
+org.opencontainers.image.licenses  "Apache License 2.0"
+org.opencontainers.image.description "Singularity image for OpenFold"
 %post
 CUDA=11.3
 SINGULARITY_CUDA=11.3
@@ -102,7 +102,7 @@ python3 -m pip install nvidia-pyindex && \
  find /opt/conda/ -follow -type f -name '*.pdf' -delete && \
  rm -f /opt/conda/lib/*avx512* || true && \
  strip /opt/conda/bin/* || true && \
- apt-get -y --allow-change-held-packages purge cmake build-essential \
+ apt-get -y --allow-change-held-packages purge cmake cmake-data git manpages-dev  build-essential \
  libcublas-${CUDA_V1}-${CUDA_V2} libcusparse-${CUDA_V1}-${CUDA_V2} \
  libcudnn8 libnpp-${CUDA_V1}-${CUDA_V2} || true && \
  apt-get -y  autoremove && \
