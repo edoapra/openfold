@@ -11,7 +11,7 @@ train_openfold.py /opt/openfold/train_openfold.py
 setup.py /opt/openfold/setup.py
 lib/openmm.patch /opt/openfold/lib/openmm.patch
 %labels
-MAINTAINER  Edoardo Apra <edoardo.apra@pnnl.gov>
+maintainer  Edoardo Apra <edoardo.apra@pnnl.gov>
 org.opencontainers.image.version  "1.0.0"
 org.opencontainers.image.authors  "Gustaf Ahdritz & Edoardo Apra"
 org.opencontainers.image.source  "https://github.com/aqlaboratory/openfold"
