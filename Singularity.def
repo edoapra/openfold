@@ -111,6 +111,7 @@ python3 -m pip install nvidia-pyindex && \
  apt-get clean && \
  find /usr/local/cuda-${CUDA_V1}.${CUDA_V2} -follow -type f -name 'lib*.a' -delete && \
  find /usr/local/cuda-${CUDA_V1}.${CUDA_V2} -follow -type f -name '*.h' -delete && \
+ rm -rf /usr/local/cuda-${CUDA_V1}.${CUDA_V2}/nvvm* && \
  echo '/opt/conda size' `du -sh /opt/conda` && \
  dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
 
