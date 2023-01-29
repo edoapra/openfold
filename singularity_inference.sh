@@ -5,14 +5,18 @@ export OUTDIR=`pwd`/out.$SLURM_JOBID
 export https_proxy=http://proxy.emsl.pnl.gov:3128
 export http_proxy=http://proxy.emsl.pnl.gov:3128
 export DOWNLOAD_DIR=/tahoma/emsla60288/edo/openfold/data
-INPUT_FASTA_DIR=/database/test_fasta_dir
-OPENFOLD_PATH=/opt/openfold/
-OPENFOLD_RESOURCES=/tahoma/emsla60288/edo/openfold/openfold/resources
+export INPUT_FASTA_DIR=/database/test_fasta_dir
+export OPENFOLD_PATH=/opt/openfold/
+export OPENFOLD_RESOURCES=/tahoma/emsla60288/edo/openfold/openfold/resources
+export PRE_ALIGN=" "
+#export PRE_ALIGN=" --use_precomputed_alignments /tahoma/emsla60288/edo/openfold-build/alignments "
 mkdir -p $OUTDIR
 cd $WORKDIR
-#rm -rf alignments
 singularity pull -F --name openfold.simg oras://ghcr.io/edoapra/openfold/openfold:latest
-INPUT_FASTA_DIR=/tahoma/emsla60288/edo/openfold/data/test_fasta_dir
+export N_CPUS=4
+env | grep N_CPUS
+env | grep PRE_ALIGN
+env | grep DIR
 singularity exec \
 --nv \
 --bind $PWD:/data \
@@ -29,14 +33,17 @@ singularity exec \
     --output_dir ./ \
     --bfd_database_path /database/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt \
     --model_device "cuda" \
+    --cpus $N_CPUS \
     --jackhmmer_binary_path jackhmmer \
     --hhblits_binary_path hhblits \
     --hhsearch_binary_path hhsearch \
     --kalign_binary_path bin/kalign \
     --config_preset "model_1_ptm" \
+    $PRE_ALIGN  \
     --openfold_checkpoint_path $OPENFOLD_RESOURCES/openfold_params/finetuning_ptm_2.pt
-rsync -av  *  $OUTDIR/.
+rsync --exclude=openfold.simg -av  *  $OUTDIR/.
 exit 0
+#    --trace_model \
 
 
 # run_pretrained_openfold.py [-h]
