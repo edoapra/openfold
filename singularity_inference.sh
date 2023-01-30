@@ -2,8 +2,6 @@
 export ORGDIR=`pwd`
 export WORKDIR=/big_scratch
 export OUTDIR=`pwd`/out.$SLURM_JOBID
-export https_proxy=http://proxy.emsl.pnl.gov:3128
-export http_proxy=http://proxy.emsl.pnl.gov:3128
 export DOWNLOAD_DIR=/tahoma/emsla60288/edo/openfold/data
 export INPUT_FASTA_DIR=/database/test_fasta_dir
 export OPENFOLD_PATH=/opt/openfold/
