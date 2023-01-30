@@ -5,6 +5,7 @@ export OUTDIR=`pwd`/out.$SLURM_JOBID
 export https_proxy=http://proxy.emsl.pnl.gov:3128
 export http_proxy=http://proxy.emsl.pnl.gov:3128
 export DOWNLOAD_DIR=/tahoma/emsla60288/edo/openfold/data
+export MMSEQS_NUM_THREADS=8
 cd $WORKDIR
 rsync -av $ORGDIR/scripts .
 singularity pull -F --name openfold.simg oras://ghcr.io/edoapra/openfold/openfold:latest
@@ -19,8 +20,9 @@ singularity exec \
 	        uniref30_2103_db \
     $OUTDIR \
     /opt/conda/bin/mmseqs \
+    --hhsearch_binary_path /opt/conda/bin/hhsearch \
     --env_db colabfold_envdb_202108_db \
-    --pdb70 /database/pdb70/pdb70 \
+    --pdb70 /database/pdb70/pdb70 
 
 rsync --exclude=openfold.simg -av  *  $OUTDIR/.
 exit 0

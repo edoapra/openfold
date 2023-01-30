@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -t 10:59:00
+#SBATCH -t 9:59:00
 #SBATCH -N 1
 #SBATCH -A emsla60288
 #SBATCH -p analysis 
@@ -11,4 +11,6 @@ module purge
 module load gcc
 export https_proxy=http://proxy.emsl.pnl.gov:3128
 export http_proxy=http://proxy.emsl.pnl.gov:3128
+echo start `date`
 ./singularity_training.sh
+echo end `date`
