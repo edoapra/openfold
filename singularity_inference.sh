@@ -1,13 +1,18 @@
 #!/bin/bash
 export ORGDIR=`pwd`
 export WORKDIR=/big_scratch
-export OUTDIR=`pwd`/out.$SLURM_JOBID
+if [[ -z "${SLURM_JOBID}" ]]; then
+ export OUTDIR=`pwd`/out.`date +%a_%b_%d_%H:%M:%S_%Y`
+else
+ export OUTDIR=`pwd`/out.$SLURM_JOBID
+fi
 export DOWNLOAD_DIR=/tahoma/emsla60288/edo/openfold/data
 export INPUT_FASTA_DIR=/database/test_fasta_dir
-export OPENFOLD_PATH=/opt/openfold/
 export OPENFOLD_RESOURCES=/tahoma/emsla60288/edo/openfold/openfold/resources
 export PRE_ALIGN=" "
-#export PRE_ALIGN=" --use_precomputed_alignments /tahoma/emsla60288/edo/openfold-build/alignments "
+# uncomment to use precomputed alignments
+#export PRE_ALIGN=" --use_precomputed_alignments `pwd`/alignments "
+export OPENFOLD_PATH=/opt/openfold/
 mkdir -p $OUTDIR
 cd $WORKDIR
 singularity pull -F --name openfold.simg oras://ghcr.io/edoapra/openfold/openfold:latest
