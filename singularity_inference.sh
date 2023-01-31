@@ -1,17 +1,25 @@
 #!/bin/bash
-CUDA_DIR=/tahoma/emsla60288/edo/cuda-11.3
-export LD_LIBRARY_PATH=$CUDA_DIR/lib64:$LD_LIBRARY_PATH
+export ORGDIR=`pwd`
+export WORKDIR=/big_scratch
+export OUTDIR=`pwd`/out.$SLURM_JOBID
 export DOWNLOAD_DIR=/tahoma/emsla60288/edo/openfold/data
-INPUT_FASTA_DIR=/database/test_fasta_dir
-OPENFOLD_PATH=/opt/openfold/
-OPENFOLD_RESOURCES=/tahoma/emsla60288/edo/openfold/openfold/resources
-rm -rf alignments
-INPUT_FASTA_DIR=/tahoma/emsla60288/edo/openfold/data/test_fasta_dir
+export INPUT_FASTA_DIR=/database/test_fasta_dir
+export OPENFOLD_PATH=/opt/openfold/
+export OPENFOLD_RESOURCES=/tahoma/emsla60288/edo/openfold/openfold/resources
+export PRE_ALIGN=" "
+#export PRE_ALIGN=" --use_precomputed_alignments /tahoma/emsla60288/edo/openfold-build/alignments "
+mkdir -p $OUTDIR
+cd $WORKDIR
+singularity pull -F --name openfold.simg oras://ghcr.io/edoapra/openfold/openfold:latest
+export N_CPUS=4
+env | grep N_CPUS
+env | grep PRE_ALIGN
+env | grep DIR
 singularity exec \
 --nv \
 --bind $PWD:/data \
 --bind "$DOWNLOAD_DIR":/database \
---bind "$OPENFOLD_RESOURCES":/resources \
+--bind "$OPENFOLD_RESOURCES":$OPENFOLD_PATH/openfold/resources \
 ./openfold.simg \
 	    python3 $OPENFOLD_PATH/run_pretrained_openfold.py \
     $INPUT_FASTA_DIR \
@@ -23,13 +31,18 @@ singularity exec \
     --output_dir ./ \
     --bfd_database_path /database/bfd/bfd_metaclust_clu_complete_id30_c90_final_seq.sorted_opt \
     --model_device "cuda" \
+    --cpus $N_CPUS \
     --jackhmmer_binary_path jackhmmer \
     --hhblits_binary_path hhblits \
     --hhsearch_binary_path hhsearch \
     --kalign_binary_path bin/kalign \
     --config_preset "model_1_ptm" \
-    --openfold_checkpoint_path /resources/openfold_params/finetuning_ptm_2.pt
-#    --openfold_checkpoint_path $OPENFOLD_PATH/openfold/resources/openfold_params/finetuning_ptm_2.pt
+    $PRE_ALIGN  \
+    --openfold_checkpoint_path $OPENFOLD_RESOURCES/openfold_params/finetuning_ptm_2.pt
+rsync --exclude=openfold.simg -av  *  $OUTDIR/.
+exit 0
+#    --trace_model \
+
 
 # run_pretrained_openfold.py [-h]
 #                                  [--use_precomputed_alignments USE_PRECOMPUTED_ALIGNMENTS]

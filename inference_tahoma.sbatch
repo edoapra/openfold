@@ -11,4 +11,4 @@ module purge
 module load gcc
 export https_proxy=http://proxy.emsl.pnl.gov:3128
 export http_proxy=http://proxy.emsl.pnl.gov:3128
-/tahoma/emsla60288/edo/openfold/singularity_inference.sh
+/usr/bin/time -p ./singularity_inference.sh
