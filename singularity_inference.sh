@@ -1,17 +1,17 @@
 #!/bin/bash
-export ORGDIR=`pwd`
-export WORKDIR=/big_scratch
+export INPUT_FASTA_DIR=/tahoma/emsla60288/edo/openfold-build/fasta_dir/
+export DOWNLOAD_DIR=/tahoma/emsla60288/edo/openfold/data
+export OPENFOLD_RESOURCES=/tahoma/emsla60288/edo/openfold/openfold/resources
+export PRE_ALIGN=" "
+# uncomment to use precomputed alignments
+#export PRE_ALIGN=" --use_precomputed_alignments `pwd`/alignments "
 if [[ -z "${SLURM_JOBID}" ]]; then
  export OUTDIR=`pwd`/out.`date +%a_%b_%d_%H:%M:%S_%Y`
 else
  export OUTDIR=`pwd`/out.$SLURM_JOBID
 fi
-export DOWNLOAD_DIR=/tahoma/emsla60288/edo/openfold/data
-export INPUT_FASTA_DIR=/database/test_fasta_dir
-export OPENFOLD_RESOURCES=/tahoma/emsla60288/edo/openfold/openfold/resources
-export PRE_ALIGN=" "
-# uncomment to use precomputed alignments
-#export PRE_ALIGN=" --use_precomputed_alignments `pwd`/alignments "
+export ORGDIR=`pwd`
+export WORKDIR=/big_scratch
 export OPENFOLD_PATH=/opt/openfold/
 mkdir -p $OUTDIR
 cd $WORKDIR
@@ -43,7 +43,15 @@ singularity exec \
     --kalign_binary_path bin/kalign \
     --config_preset "model_1_ptm" \
     $PRE_ALIGN  \
-    --openfold_checkpoint_path $OPENFOLD_RESOURCES/openfold_params/finetuning_ptm_2.pt
+    --openfold_checkpoint_path $OPENFOLD_RESOURCES/openfold_params/finetuning_ptm_2.pt &
+echo pid is $pid
+while :
+do
+    if [ `ps -ef | grep "$oldpid" | grep -v "grep" | wc -l` == 0 ]; then  break; fi
+    sleep 5m
+    rsync -aq  --exclude=openfold.simg   *  $OUTDIR/.
+done
+
 rsync --exclude=openfold.simg -av  *  $OUTDIR/.
 exit 0
 #    --trace_model \
