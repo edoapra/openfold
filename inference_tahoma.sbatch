@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -t 10:59:00
+#SBATCH -t 0:59:00
 #SBATCH -N 1
 #SBATCH -A emsla60288
 #SBATCH -p analysis 
