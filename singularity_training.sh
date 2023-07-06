@@ -4,7 +4,7 @@ export WORKDIR=/big_scratch
 export OUTDIR=`pwd`/out.$SLURM_JOBID
 export https_proxy=http://proxy.emsl.pnl.gov:3128
 export http_proxy=http://proxy.emsl.pnl.gov:3128
-export DOWNLOAD_DIR=/tahoma/emsla60288/edo/openfold/data
+export DOWNLOAD_DIR=/tahoma/scicons/datasets/openfold/data
 export MMSEQS_NUM_THREADS=8
 cd $WORKDIR
 rsync -av $ORGDIR/scripts .

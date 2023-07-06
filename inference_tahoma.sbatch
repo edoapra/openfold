@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH -t 0:59:00
 #SBATCH -N 1
-#SBATCH -A emsla60288
+#SBATCH -A XXYYZZ
 #SBATCH -p analysis 
-#SBATCH -o openfold.output.%j
-#SBATCH -e openfold.output.%j
+#SBATCH -o openfold_inference.output.%j
+#SBATCH -e openfold_inference.output.%j
 #SBATCH -J of1
 source /etc/profile.d/modules.sh
 module purge

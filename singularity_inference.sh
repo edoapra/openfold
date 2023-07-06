@@ -1,7 +1,7 @@
 #!/bin/bash
-export INPUT_FASTA_DIR=/tahoma/emsla60288/edo/openfold-build/fasta_dir/
-export DOWNLOAD_DIR=/tahoma/emsla60288/edo/openfold/data
-export OPENFOLD_RESOURCES=/tahoma/emsla60288/edo/openfold/openfold/resources
+export INPUT_FASTA_DIR=need_to_specify_the_input_fast_dir
+export DOWNLOAD_DIR=/tahoma/scicons/datasets/openfold/data
+export OPENFOLD_RESOURCES=/tahoma/scicons/codes/openfold/openfold/resources
 export PRE_ALIGN=" "
 # uncomment to use precomputed alignments
 #export PRE_ALIGN=" --use_precomputed_alignments `pwd`/alignments "
@@ -44,14 +44,14 @@ singularity exec \
     --config_preset "model_1_ptm" \
     $PRE_ALIGN  \
     --openfold_checkpoint_path $OPENFOLD_RESOURCES/openfold_params/finetuning_ptm_2.pt &
+pid=$!
 echo pid is $pid
 while :
 do
-    if [ `ps -ef | grep "$oldpid" | grep -v "grep" | wc -l` == 0 ]; then  break; fi
-    sleep 5m
+    if [ `ps -ef | grep "$pid" | grep -v "grep" | wc -l` == 0 ]; then echo "exiting while";  break; fi
+    sleep 1m
     rsync -aq  --exclude=openfold.simg   *  $OUTDIR/.
 done
-
 rsync --exclude=openfold.simg -av  *  $OUTDIR/.
 exit 0
 #    --trace_model \
