@@ -52,8 +52,8 @@ conda config --set  fetch_threads 2 || true && \
       conda install -y -c conda-forge micromamba
     export MAMBA_ROOT_PREFIX=/opt/micromamba
       eval "$(micromamba shell hook --shell dash)"
-      micromamba create -c conda-forge -y -n openfold -r $MAMBA_ROOT_PREFIX -f /opt/openfold/environment.yml
-#      micromamba update -c conda-forge -y -r $MAMBA_ROOT_PREFIX  -f /opt/openfold/environment.yml
+      micromamba create -c conda-forge -y -n openfold_venv -r $MAMBA_ROOT_PREFIX -f /opt/openfold/environment.yml
+      micromamba update -c conda-forge -y -r $MAMBA_ROOT_PREFIX  -f /opt/openfold/environment.yml
       echo "ls -l $MAMBA_ROOT_PREFIX/envs" `ls -l  $MAMBA_ROOT_PREFIX/envs`
       echo "ls -l $MAMBA_ROOT_PREFIX/envs/openfold_venv" `ls -l  $MAMBA_ROOT_PREFIX/envs/openfold_venv` || true
       micromamba activate $MAMBA_ROOT_PREFIX/envs/openfold_venv
