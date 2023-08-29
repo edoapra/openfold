@@ -133,7 +133,7 @@ python3 -m pip install nvidia-pyindex && \
 
 %environment
 #export PATH=/opt/conda/bin:$PATH
-    export MYPREFIX=/opt/conda.org
+    export MYPREFIX=/opt/conda
     export MAMBA_ROOT_PREFIX=/opt/conda
     eval "$($MYPREFIX/bin/conda shell.dash hook)"
     eval "$(micromamba shell hook --shell dash)"
