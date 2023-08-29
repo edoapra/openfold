@@ -34,7 +34,9 @@ apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y wget libxml2
  apt-get clean && \
 cmake --version
 
-MYPREFIX=/opt/conda.org
+MYPREFIX=/opt/conda
+export MAMBA_ROOT_PREFIX=$MYPREFIX
+#    export MAMBA_ROOT_PREFIX=/opt/conda
     MINIFORGE3=Miniforge3-Linux-x86_64.sh
     wget -q -P /tmp  https://github.com/conda-forge/miniforge/releases/latest/download/$MINIFORGE3
     bash /tmp/$MINIFORGE3 -b -u -p $MYPREFIX
@@ -50,9 +52,9 @@ conda config --set  fetch_threads 2 || true && \
     export PATH="$MYPREFIX/bin:$PATH"
     eval "$($MYPREFIX/bin/conda shell.dash hook)"
       conda install -y -c conda-forge micromamba
-    export MAMBA_ROOT_PREFIX=/opt/conda
       eval "$(micromamba shell hook --shell dash)"
       micromamba create -c conda-forge -y -n openfold_venv -r $MAMBA_ROOT_PREFIX -f /opt/openfold/environment.yml
+      conda install python=3.9
       micromamba update -c conda-forge -y -r $MAMBA_ROOT_PREFIX  -f /opt/openfold/environment.yml
       echo "ls -l $MAMBA_ROOT_PREFIX/envs" `ls -l  $MAMBA_ROOT_PREFIX/envs`
       echo "ls -l $MAMBA_ROOT_PREFIX/envs/openfold_venv" `ls -l  $MAMBA_ROOT_PREFIX/envs/openfold_venv` || true
@@ -75,7 +77,7 @@ conda config --set  fetch_threads 2 || true && \
 ## Decompress test data
 #gunzip tests/test_data/sample_feats.pickle.gz
 
-patch -p0 -d /opt/conda/lib/python3.7/site-packages/ < /opt/openfold/lib/openmm.patch
+patch -p0 -d $MAMBA_ROOT_PREFIX/envs/openfold_venv/lib/python3.9/site-packages/ < /opt/openfold/lib/openmm.patch
 mkdir -p /opt/openfold
 cd /opt/openfold
 python3 setup.py install
@@ -134,10 +136,10 @@ python3 -m pip install nvidia-pyindex && \
 %environment
 #export PATH=/opt/conda/bin:$PATH
     export MYPREFIX=/opt/conda
-    export MAMBA_ROOT_PREFIX=/opt/conda
+    export MAMBA_ROOT_PREFIX=$MYPREFIX
     eval "$($MYPREFIX/bin/conda shell.dash hook)"
     eval "$(micromamba shell hook --shell dash)"
-    micromamba activate $MAMBA_ROOT_PREFIX/envs/openfold
+    micromamba activate $MAMBA_ROOT_PREFIX/envs/openfold_venv
 %runscript
 cd /opt/openfold
 exec /bin/bash "$@"
