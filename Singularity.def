@@ -52,10 +52,11 @@ conda config --set  fetch_threads 2 || true && \
       conda install -y -c conda-forge micromamba
     export MAMBA_ROOT_PREFIX=/opt/micromamba
       eval "$(micromamba shell hook --shell dash)"
-    export MAMBA_ROOT_PREFIX=/opt/micromamba
       micromamba create -c conda-forge -y -n openfold -r $MAMBA_ROOT_PREFIX -f /opt/openfold/environment.yml
-      micromamba update -c conda-forge -y -r $MAMBA_ROOT_PREFIX  -f /opt/openfold/environment.yml
-      micromamba activate $MAMBA_ROOT_PREFIX/openfold
+#      micromamba update -c conda-forge -y -r $MAMBA_ROOT_PREFIX  -f /opt/openfold/environment.yml
+      echo "ls -l $MAMBA_ROOT_PREFIX/envs" `ls -l  $MAMBA_ROOT_PREFIX/envs`
+      echo "ls -l $MAMBA_ROOT_PREFIX/envs/openfold_venv" `ls -l  $MAMBA_ROOT_PREFIX/envs/openfold_venv` || true
+      micromamba activate $MAMBA_ROOT_PREFIX/envs/openfold_venv
 
 # we rely on openfold/openfold/resources being external from the container
 #wget -q -P /opt/openfold/openfold/resources \
@@ -123,10 +124,20 @@ python3 -m pip install nvidia-pyindex && \
  find /usr/local/cuda-${CUDA_V1}.${CUDA_V2} -follow -type f -name '*.h' -delete && \
  rm -rf /usr/local/cuda-${CUDA_V1}.${CUDA_V2}/nvvm* && \
  echo '/opt/conda size' `du -sh /opt/conda` && \
+ echo 'MAMBA_ROOT_PREFIX' `du -sh $MAMBA_ROOT_PREFIX` && \
+ rm -rf $MYPREFIX/lib/python*/site-packages/tensorflow/include &&\
+ rm -rf $MAMBA_ROOT_PREFIX/envs/openfold/lib/python*/site-packages/tensorflow/include || true &&\
+ strip --strip-unneeded $(find /usr/local/cuda-${CUDA_V1}.${CUDA_V2} -type f -name "*.so*") &&\
+ strip --strip-unneeded $(find  $MAMBA_ROOT_PREFIX -type f -name "*.so*" ! -name "libncurses*.so" ! -name "libgcc_s.so")  &&\
  dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
 
 %environment
-export PATH=/opt/conda/bin:$PATH
+#export PATH=/opt/conda/bin:$PATH
+    export MYPREFIX=/opt/conda
+    export MAMBA_ROOT_PREFIX=/opt/micromamba
+    eval "$($MYPREFIX/bin/conda shell.dash hook)"
+    eval "$(micromamba shell hook --shell dash)"
+    micromamba activate $MAMBA_ROOT_PREFIX/envs/openfold
 %runscript
 cd /opt/openfold
 exec /bin/bash "$@"
