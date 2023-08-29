@@ -76,7 +76,7 @@ conda config --set  fetch_threads 2 || true && \
 #bash scripts/download_alphafold_params.sh openfold/resources  &&  \
 ## Decompress test data
 #gunzip tests/test_data/sample_feats.pickle.gz
-
+echo 'ls -lrt $MAMBA_ROOT_PREFIX/envs/openfold_venv/lib|grep python' `ls -lrt $MAMBA_ROOT_PREFIX/envs/openfold_venv/lib|grep python`
 patch -p0 -d $MAMBA_ROOT_PREFIX/envs/openfold_venv/lib/python3.9/site-packages/ < /opt/openfold/lib/openmm.patch
 mkdir -p /opt/openfold
 cd /opt/openfold
