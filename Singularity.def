@@ -34,7 +34,7 @@ apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y wget libxml2
  apt-get clean && \
 cmake --version
 
-MYPREFIX=/opt/conda
+MYPREFIX=/opt/conda.org
     MINIFORGE3=Miniforge3-Linux-x86_64.sh
     wget -q -P /tmp  https://github.com/conda-forge/miniforge/releases/latest/download/$MINIFORGE3
     bash /tmp/$MINIFORGE3 -b -u -p $MYPREFIX
@@ -50,7 +50,7 @@ conda config --set  fetch_threads 2 || true && \
     export PATH="$MYPREFIX/bin:$PATH"
     eval "$($MYPREFIX/bin/conda shell.dash hook)"
       conda install -y -c conda-forge micromamba
-    export MAMBA_ROOT_PREFIX=/opt/micromamba
+    export MAMBA_ROOT_PREFIX=/opt/conda
       eval "$(micromamba shell hook --shell dash)"
       micromamba create -c conda-forge -y -n openfold_venv -r $MAMBA_ROOT_PREFIX -f /opt/openfold/environment.yml
       micromamba update -c conda-forge -y -r $MAMBA_ROOT_PREFIX  -f /opt/openfold/environment.yml
@@ -133,8 +133,8 @@ python3 -m pip install nvidia-pyindex && \
 
 %environment
 #export PATH=/opt/conda/bin:$PATH
-    export MYPREFIX=/opt/conda
-    export MAMBA_ROOT_PREFIX=/opt/micromamba
+    export MYPREFIX=/opt/conda.org
+    export MAMBA_ROOT_PREFIX=/opt/conda
     eval "$($MYPREFIX/bin/conda shell.dash hook)"
     eval "$(micromamba shell hook --shell dash)"
     micromamba activate $MAMBA_ROOT_PREFIX/envs/openfold
