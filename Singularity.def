@@ -34,18 +34,28 @@ apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y wget libxml2
  apt-get clean && \
 cmake --version
 
-wget -O /tmp/miniconda3.sh \
-https://repo.anaconda.com/miniconda/Miniconda3-py37_4.12.0-Linux-x86_64.sh && \
- bash /tmp/miniconda3.sh -b -p /opt/conda  && \
- rm /tmp/miniconda3.sh
-PATH=/opt/conda/bin:$PATH
+MYPREFIX=/opt/conda
+    MINIFORGE3=Miniforge3-Linux-x86_64.sh
+    wget -q -P /tmp  https://github.com/conda-forge/miniforge/releases/latest/download/$MINIFORGE3
+    bash /tmp/$MINIFORGE3 -b -u -p $MYPREFIX
+    rm -f /tmp/$MINIFORGE3
+PATH=$MYPREFIX/bin:$PATH
 
 
 # installing into the base environment since the docker container wont do anything other than run openfold
 export CONDA_FETCH_THREADS=2 # parallel download for recent conda versions
 export MAX_JOBS=2 # ninja workers
 conda config --set  fetch_threads 2 || true && \
-conda env update -n base --file /opt/openfold/environment.yml && conda clean --all
+#conda env update -n base --file /opt/openfold/environment.yml && conda clean --all
+    export PATH="$MYPREFIX/bin:$PATH"
+    eval "$($MYPREFIX/bin/conda shell.dash hook)"
+      conda install -y -c conda-forge micromamba
+    export MAMBA_ROOT_PREFIX=/opt/micromamba
+      eval "$(micromamba shell hook --shell dash)"
+    export MAMBA_ROOT_PREFIX=/opt/micromamba
+      micromamba create -c conda-forge -y -n openfold -r $MAMBA_ROOT_PREFIX -f /opt/openfold/environment.yml
+      micromamba update -c conda-forge -y -r $MAMBA_ROOT_PREFIX  -f /opt/openfold/environment.yml
+      micromamba activate $MAMBA_ROOT_PREFIX/openfold
 
 # we rely on openfold/openfold/resources being external from the container
 #wget -q -P /opt/openfold/openfold/resources \
