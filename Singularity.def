@@ -131,6 +131,8 @@ python3 -m pip install nvidia-pyindex && \
  echo 'MAMBA_ROOT_PREFIX' `du -sh $MAMBA_ROOT_PREFIX` && \
  rm -rf $MYPREFIX/lib/python*/site-packages/tensorflow/include &&\
  rm -rf $MAMBA_ROOT_PREFIX/envs/openfold/lib/python*/site-packages/tensorflow/include || true &&\
+ strip --strip-unneeded $(find /usr/local/cuda-${CUDA_V1}.${CUDA_V2} -type f -name "*.so*") || true &&\
+ strip --strip-unneeded $(find  $MAMBA_ROOT_PREFIX -type f -name "*.so*" ! -name "libncurses*.so*" ! -name "libgcc*.so*" ! -name "libgfortran*.so*" ) || true &&\
  dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
 
 %environment
