@@ -118,11 +118,12 @@ python3 -m pip install nvidia-pyindex && \
  strip /opt/conda/bin/* || true && \
  apt-get -y --allow-change-held-packages purge cmake cmake-data git manpages-dev  build-essential \
  libcublas-${CUDA_V1}-${CUDA_V2} libcusparse-${CUDA_V1}-${CUDA_V2} \
- libcudnn8 libnpp-${CUDA_V1}-${CUDA_V2} || true && \
+ libcudnn8 libnpp-${CUDA_V1}-${CUDA_V2} libcusolver-dev-${CUDA_V1}-${CUDA_V2} || true && \
  apt-get -y  autoremove && \
  apt update && \
  apt-get -y install libgomp1:amd64 libcusolver-${CUDA_V1}-${CUDA_V2} cuda-nvcc-${CUDA_V1}-${CUDA_V2}  && \
  apt-get clean && \
+ rm -rf /var/cache && \
  find /usr/local/cuda-${CUDA_V1}.${CUDA_V2} -follow -type f -name 'lib*.a' -delete && \
  find /usr/local/cuda-${CUDA_V1}.${CUDA_V2} -follow -type f -name '*.h' -delete && \
  rm -rf /usr/local/cuda-${CUDA_V1}.${CUDA_V2}/nvvm* && \
