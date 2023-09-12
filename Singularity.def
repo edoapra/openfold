@@ -116,7 +116,6 @@ python3 -m pip install nvidia-pyindex && \
  find /opt/conda/ -follow -type f -name '*.pdf' -delete && \
  rm -f /opt/conda/lib/*avx512* || true && \
  strip /opt/conda/bin/* || true && \
--name "libgfortran*.so*" ) || true &&\
  dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100 && \
  df -h && \
  apt-get -y --allow-change-held-packages purge cmake cmake-data git manpages-dev  \
