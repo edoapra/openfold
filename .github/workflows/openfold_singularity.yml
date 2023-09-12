@@ -47,7 +47,7 @@ jobs:
       run: |
         pwd
         ls -l
-        apptainer build --fakeroot openfold.simg  Singularity.def
+        apptainer build --fakeroot /tmp/openfold.simg  Singularity.def
     - name: builddate
       id: build-date
       run: |
@@ -58,11 +58,12 @@ jobs:
         pwd
         ls -l
         apptainer remote list
-        apptainer push openfold.simg ${{ env.tag }}:${{ env.date }}
-        apptainer push openfold.simg ${{ env.tag }}:latest
+        apptainer push /tmp/openfold.simg ${{ env.tag }}:${{ env.date }}
+        apptainer push /tmp/openfold.simg ${{ env.tag }}:latest
     - name: test image with apptainer
       run: |
-        apptainer pull -F openfold.sif ${{ env.tag }}:${{ env.date }}
+        rm -f /tmp/openfold.simg
+        apptainer pull -F /tmp/openfold.sif ${{ env.tag }}:${{ env.date }}
         apptainer exec ${{ env.tag }}:${{ env.date }} ldd /opt/conda/bin/hhsearch || true
         apptainer exec ${{ env.tag }}:${{ env.date }} hhsearch -h || true
         apptainer exec ${{ env.tag }}:${{ env.date }} ptxas -V || true
