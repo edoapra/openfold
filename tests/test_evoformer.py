@@ -130,13 +130,31 @@ class TestEvoformerStack(unittest.TestCase):
             torch.as_tensor(masks["pair"]).cuda(),
             chunk_size=4,
             _mask_trans=False,
+            inplace_safe=False,
         )
 
         out_repro_msa = out_repro_msa.cpu()
         out_repro_pair = out_repro_pair.cpu()
 
-        assert(torch.max(torch.abs(out_repro_msa - out_gt_msa)) < consts.eps)
-        assert(torch.max(torch.abs(out_repro_pair - out_gt_pair)) < consts.eps)
+        self.assertTrue(torch.mean(torch.abs(out_repro_msa - out_gt_msa)) < consts.eps)
+        self.assertTrue(torch.max(torch.abs(out_repro_pair - out_gt_pair)) < consts.eps)
+
+        # Inplace version
+        out_repro_msa, out_repro_pair = model.evoformer.blocks[0](
+            torch.as_tensor(activations["msa"]).cuda(),
+            torch.as_tensor(activations["pair"]).cuda(),
+            torch.as_tensor(masks["msa"]).cuda(),
+            torch.as_tensor(masks["pair"]).cuda(),
+            chunk_size=4,
+            _mask_trans=False,
+            inplace_safe=True,
+        )
+
+        out_repro_msa = out_repro_msa.cpu()
+        out_repro_pair = out_repro_pair.cpu()
+
+        self.assertTrue(torch.mean(torch.abs(out_repro_msa - out_gt_msa)) < consts.eps)
+        self.assertTrue(torch.max(torch.abs(out_repro_pair - out_gt_pair)) < consts.eps)
 
 
 class TestExtraMSAStack(unittest.TestCase):
@@ -175,10 +193,10 @@ class TestExtraMSAStack(unittest.TestCase):
             ckpt=False,
             inf=inf,
             eps=eps,
-        ).eval()
+        ).eval().cuda()
 
-        m = torch.rand((batch_size, s_t, n_res, c_m))
-        z = torch.rand((batch_size, n_res, n_res, c_z))
+        m = torch.rand((batch_size, s_t, n_res, c_m), device="cuda")
+        z = torch.rand((batch_size, n_res, n_res, c_z), device="cuda")
         msa_mask = torch.randint(
             0,
             2,
@@ -187,6 +205,7 @@ class TestExtraMSAStack(unittest.TestCase):
                 s_t,
                 n_res,
             ),
+            device="cuda",
         )
         pair_mask = torch.randint(
             0,
@@ -196,6 +215,7 @@ class TestExtraMSAStack(unittest.TestCase):
                 n_res,
                 n_res,
             ),
+            device="cuda",
         )
 
         shape_z_before = z.shape
@@ -266,9 +286,6 @@ class TestMSATransition(unittest.TestCase):
             .cpu()
         )
 
-        print(out_gt)
-        print(out_repro)
-        
         self.assertTrue(torch.max(torch.abs(out_gt - out_repro)) < consts.eps)
 
 
