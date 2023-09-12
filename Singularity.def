@@ -77,7 +77,8 @@ conda config --set  fetch_threads 2 || true && \
 ## Decompress test data
 #gunzip tests/test_data/sample_feats.pickle.gz
 echo 'ls -lrt $MAMBA_ROOT_PREFIX/envs/openfold_venv/lib|grep python' `ls -lrt $MAMBA_ROOT_PREFIX/envs/openfold_venv/lib|grep python`
-patch -p0 -d $MAMBA_ROOT_PREFIX/envs/openfold_venv/lib/python3.7/site-packages/ < /opt/openfold/lib/openmm.patch
+PY3_MINORV=$(python3 -V |cut -d ' ' -f 2 |cut -d '.' -f 2)
+patch -p0 -d $MAMBA_ROOT_PREFIX/envs/openfold_venv/lib/python3."$PY3_MINORV"/site-packages/ < /opt/openfold/lib/openmm.patch
 mkdir -p /opt/openfold
 cd /opt/openfold
 python3 setup.py install
